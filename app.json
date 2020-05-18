@@ -1,0 +1,17 @@
+{
+  "name": "parkable",
+  "displayName": "parkable",
+  "expo": {
+    "name": "parkable",
+    "slug": "parkable",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
