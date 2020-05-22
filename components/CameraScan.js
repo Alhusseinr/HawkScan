@@ -47,7 +47,7 @@ export default class BarcodeScannerExample extends React.Component {
                             <Row style={{ width: '100%' }} size={20}>
                                 <Col>
                                     <Button
-                                        mode="contained" style={{ padding: 5, margin: 5 }} color="#E9190F"
+                                        mode="contained" style={{ margin: 5 }} color="#E9190F"
                                         title={'Scan Again'}
                                         onPress={() => this.setState({ scanned: false })}
                                     >
@@ -56,7 +56,7 @@ export default class BarcodeScannerExample extends React.Component {
                                 </Col>
                                 <Col>
                                     <Button
-                                        mode="contained" style={{ padding: 5, margin: 5 }} color="#3ad53a"
+                                        mode="contained" style={{ margin: 5 }} color="#3ad53a"
                                         title={'Check In'}
                                         onPress={() => this.CheckIn()}
                                     >
