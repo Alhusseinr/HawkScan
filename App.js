@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
-import Scan from './components/CameraScan'
+import { AppRegistry, View } from "react-native";
+import Routes from './Routes';
 
 export default class App extends Component {
     render() {
         return (
-            <Scan />
+            <Routes />
         );
     }
 }
+
+AppRegistry.registerComponent('App', () => App);

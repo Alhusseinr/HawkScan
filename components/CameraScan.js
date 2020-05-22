@@ -1,6 +1,10 @@
 import * as React from 'react';
-import { Text, View, StyleSheet, Button } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 import * as Permissions from 'expo-permissions';
+import { Button } from 'react-native-elements';
+import { Col, Row, Grid } from 'react-native-easy-grid';
+import LinearGradient from 'react-native-linear-gradient';
+
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
@@ -8,6 +12,7 @@ export default class BarcodeScannerExample extends React.Component {
     state = {
         hasCameraPermission: null,
         scanned: false,
+        email: ''
     };
 
     async componentDidMount() {
@@ -17,6 +22,10 @@ export default class BarcodeScannerExample extends React.Component {
     getPermissionsAsync = async () => {
         const { status } = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({ hasCameraPermission: status === 'granted' });
+    };
+
+    CheckIn = () => {
+        alert(`${this.state.email} has been checked in`);
     };
 
     render() {
@@ -29,26 +38,46 @@ export default class BarcodeScannerExample extends React.Component {
             return <Text>No access to camera</Text>;
         }
         return (
-            <View
-                style={{
-                    flex: 1,
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                }}>
-                <BarCodeScanner
-                    onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
-                    style={StyleSheet.absoluteFillObject}
-                />
-
-                {scanned && (
-                    <Button title={'Tap to Scan Again'} onPress={() => this.setState({ scanned: false })} />
-                )}
-            </View>
+            <Grid>
+                {scanned  ?
+                    <Row>
+                        <Grid style={{ width: '100%' }}>
+                            <Row style={{ margin: 10 }} size={80}>
+                                <Text><Text style={{ fontWeight: "bold" }}>User Email:</Text> {this.state.email}</Text>
+                            </Row>
+                            <Row style={{ width: '100%' }} size={20}>
+                                <Col>
+                                    <Button style={{ margin: 1 }}
+                                            title={'Scan Again'}
+                                            onPress={() => this.setState({ scanned: false })}
+                                            linearGradientProps={{
+                                                colors: ['blue', 'blue'],
+                                            }}
+                                    />
+                                </Col>
+                                <Col>
+                                    <Button style={{ margin: 1 }}
+                                            title={'Check In'}
+                                            onPress={() => this.CheckIn()}
+                                            linearGradientProps={{
+                                                colors: ['red', 'red']
+                                            }}
+                                    />
+                                </Col>
+                            </Row>
+                        </Grid>
+                    </Row>
+                    :
+                    <BarCodeScanner
+                        onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
+                        style={StyleSheet.absoluteFillObject}
+                    />
+                }
+            </Grid>
         );
     }
 
-    handleBarCodeScanned = ({ type, data }) => {
-        this.setState({ scanned: true });
-        alert(`${data}`);
+    handleBarCodeScanned = ({ data }) => {
+        this.setState({ scanned: true, email: data });
     };
 }
