@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Text} from "react-native";
+import { Text } from "react-native";
 
 class UserInfo extends Component {
     constructor(props) {

@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
 import * as Permissions from 'expo-permissions';
-import { Button } from 'react-native-elements';
+import { Button } from 'react-native-paper';
 import { Col, Row, Grid } from 'react-native-easy-grid';
-import LinearGradient from 'react-native-linear-gradient';
 
 
 import { BarCodeScanner } from 'expo-barcode-scanner';
@@ -47,22 +46,22 @@ export default class BarcodeScannerExample extends React.Component {
                             </Row>
                             <Row style={{ width: '100%' }} size={20}>
                                 <Col>
-                                    <Button style={{ margin: 1 }}
-                                            title={'Scan Again'}
-                                            onPress={() => this.setState({ scanned: false })}
-                                            linearGradientProps={{
-                                                colors: ['blue', 'blue'],
-                                            }}
-                                    />
+                                    <Button
+                                        mode="contained" style={{ padding: 5, margin: 5 }} color="#E9190F"
+                                        title={'Scan Again'}
+                                        onPress={() => this.setState({ scanned: false })}
+                                    >
+                                        Scan Again
+                                    </Button>
                                 </Col>
                                 <Col>
-                                    <Button style={{ margin: 1 }}
-                                            title={'Check In'}
-                                            onPress={() => this.CheckIn()}
-                                            linearGradientProps={{
-                                                colors: ['red', 'red']
-                                            }}
-                                    />
+                                    <Button
+                                        mode="contained" style={{ padding: 5, margin: 5 }} color="#3ad53a"
+                                        title={'Check In'}
+                                        onPress={() => this.CheckIn()}
+                                    >
+                                        Check In
+                                    </Button>
                                 </Col>
                             </Row>
                         </Grid>

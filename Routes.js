@@ -3,6 +3,11 @@ import { Router, Scene } from "react-native-router-flux";
 import Scan from './components/CameraScan';
 import Login from "./components/Login";
 import UserInfo from "./components/UserInfo";
+import { Text } from 'react-native'
+
+const Title = () => {
+    return (<Text style={{fontFamily: 'Didot-Italic'}}>Login</Text>)
+}
 
 const Routes = () => (
     <Router>
