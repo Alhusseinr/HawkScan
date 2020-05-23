@@ -3,13 +3,18 @@ import {
     Keyboard, StyleSheet,
     Text, View, KeyboardAvoidingView,
     TouchableWithoutFeedback, Platform,
+    AsyncStorage
 } from "react-native";
 import { Actions } from "react-native-router-flux";
 import { TextInput, Button, HelperText } from 'react-native-paper';
+import axios from 'react-native-axios';
 
 const theme = {
     colors: { primary: '#E9190F', underlayColor: 'transparent'}
 };
+
+const URI = '127.0.0.1:5000';
+
 
 class LoginScreen extends React.Component {
     constructor(props) {
@@ -36,9 +41,61 @@ class LoginScreen extends React.Component {
         this.setState({ errors });
 
         if (Object.keys(errors).length === 0) {
-            Actions.QRScanner();
+
+            //console.log("here", AsyncStorage.getItem('token'));
+
+
+            axios.post('https://hawkhack.io/api/u/login', {email, password})
+                .then(response => {
+                    console.log('response', response.data.token);
+                    if(response.status === 200) {
+                        this.setTokenValue(response.data.token);
+                        console.log(this._getStorageValue());
+                        AsyncStorage.getAllKeys().then(console.log);
+                        // if(AsyncStorage.getItem('token') === null) {
+                        //     AsyncStorage.setItem('token', response.data.token);
+                        //     console.log(this._getStorageValue());
+                        // } else {
+                        //     AsyncStorage.removeItem('token');
+                        //     console.log('removed token');
+                        //     Actions.Login();
+                        // }
+                    }
+                }).catch(e => {
+                    console.log(e);
+                    throw e;
+                });
+
+            // fetch(URI + '/api/u/login', {
+            //     method: 'POST',
+            //     body: JSON.stringify(email, password),
+            //     headers: {
+            //         'Content-Type': 'application/json'
+            //     }
+            // }).then(response => response.json()).then(result => {
+            //     console.log('results', result)
+            // }).catch(e => console.log(e));
+
+            //Actions.QRScanner();
         }
     };
+
+    async setTokenValue(token) {
+        await AsyncStorage.getItem('token', JSON.stringify(token)).then(console.log);
+    }
+
+    async _getStorageValue(){
+        try{
+            const value = await AsyncStorage.getItem('token');
+            if(value !== null) {
+                return value
+            }
+            return 'no token'
+
+        } catch (e) {
+            console.log(e)
+        }
+    }
 
     isEmpty = (email, password) => {
         const errors = {};
