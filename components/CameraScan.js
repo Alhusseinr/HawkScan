@@ -5,7 +5,7 @@ import { Button } from 'react-native-paper';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import axios from 'react-native-axios';
-const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlNWVhZGRjMTNjZmYxMzM4OTY3N2IxMSIsImlhdCI6MTU5MDI4MDUyOSwiZXhwIjoxNTkwMjg0MTI5fQ.gUHqdwsaGUHDu90m5svmTBcY4olRtvslCpx9_a5iV-4';
+const token = '';
 
 const columns = {
     firstName: 'First Name: ',
