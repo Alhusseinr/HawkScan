@@ -23,7 +23,8 @@ class LoginScreen extends React.Component {
         this.state = {
             email: "",
             password: "",
-            errors: {}
+            errors: {},
+            token: ''
         }
     }
 
@@ -45,26 +46,26 @@ class LoginScreen extends React.Component {
             //console.log("here", AsyncStorage.getItem('token'));
 
 
-            axios.post('https://hawkhack.io/api/u/login', {email, password})
-                .then(response => {
-                    console.log('response', response.data.token);
-                    if(response.status === 200) {
-                        this.setTokenValue(response.data.token);
-                        console.log(this._getStorageValue());
-                        AsyncStorage.getAllKeys().then(console.log);
-                        // if(AsyncStorage.getItem('token') === null) {
-                        //     AsyncStorage.setItem('token', response.data.token);
-                        //     console.log(this._getStorageValue());
-                        // } else {
-                        //     AsyncStorage.removeItem('token');
-                        //     console.log('removed token');
-                        //     Actions.Login();
-                        // }
-                    }
-                }).catch(e => {
-                    console.log(e);
-                    throw e;
-                });
+            // axios.post('https://hawkhack.io/api/u/login', {email, password})
+            //     .then(response => {
+            //         console.log('response', response.data.token);
+            //         if(response.status === 200) {
+            //             this.setTokenValue(response.data.token);
+            //             console.log('all keys: ', this._getStorageValue());
+            //             AsyncStorage.getAllKeys().then(console.log);
+            //             if(AsyncStorage.getItem('token') === null) {
+            //                 AsyncStorage.setItem('token', response.data.token);
+            //                 console.log(this._getStorageValue());
+            //             } else {
+            //                 AsyncStorage.removeItem('token');
+            //                 console.log('removed token');
+            //                 Actions.Login();
+            //             }
+            //         }
+            //     }).catch(e => {
+            //         console.log(e);
+            //         throw e;
+            //     });
 
             // fetch(URI + '/api/u/login', {
             //     method: 'POST',
@@ -76,25 +77,13 @@ class LoginScreen extends React.Component {
             //     console.log('results', result)
             // }).catch(e => console.log(e));
 
-            //Actions.QRScanner();
+            Actions.QRScanner();
         }
     };
 
-    async setTokenValue(token) {
-        await AsyncStorage.getItem('token', JSON.stringify(token)).then(console.log);
-    }
-
-    async _getStorageValue(){
-        try{
-            const value = await AsyncStorage.getItem('token');
-            if(value !== null) {
-                return value
-            }
-            return 'no token'
-
-        } catch (e) {
-            console.log(e)
-        }
+    setTokenValue(token) {
+        console.log('here in setting token');
+        AsyncStorage.setItem('different name', 'Hard coded token', () => {}).then(r => {console.log(r)}).catch(e => console.log(e));
     }
 
     isEmpty = (email, password) => {

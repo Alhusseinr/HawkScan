@@ -1,17 +1,26 @@
 import * as React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import {Text, View, StyleSheet, AsyncStorage} from 'react-native';
 import * as Permissions from 'expo-permissions';
 import { Button } from 'react-native-paper';
 import { Col, Row, Grid } from 'react-native-easy-grid';
-
-
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import axios from 'react-native-axios';
+const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlNWVhZGRjMTNjZmYxMzM4OTY3N2IxMSIsImlhdCI6MTU5MDI4MDUyOSwiZXhwIjoxNTkwMjg0MTI5fQ.gUHqdwsaGUHDu90m5svmTBcY4olRtvslCpx9_a5iV-4';
+
+const columns = {
+    firstName: 'First Name: ',
+    lastName: 'Last Name: ',
+    email: 'Email: ',
+    dateOfBirth: 'Date Of Birth: ',
+    school: 'School: ',
+    status: 'Status: '
+};
 
 export default class BarcodeScannerExample extends React.Component {
     state = {
         hasCameraPermission: null,
         scanned: false,
-        email: ''
+        profile: {}
     };
 
     async componentDidMount() {
@@ -24,7 +33,12 @@ export default class BarcodeScannerExample extends React.Component {
     };
 
     CheckIn = () => {
-        alert(`${this.state.email} has been checked in`);
+        alert(`${this.state.profile.firstName + ' ' + this.state.profile.lastName} has been checked in`);
+    };
+
+    formatDate = (date) => {
+        const newDate = date.substring(0, 10);
+        return newDate;
     };
 
     render() {
@@ -40,23 +54,42 @@ export default class BarcodeScannerExample extends React.Component {
             <Grid>
                 {scanned  ?
                     <Row>
-                        <Grid style={{ width: '100%' }}>
-                            <Row style={{ margin: 10 }} size={80}>
-                                <Text><Text style={{ fontWeight: "bold" }}>User Email:</Text> {this.state.email}</Text>
+                        <Grid>
+                            <Row style={{ margin: 20 }} size={70}>
+                                <Col style={{ alignItems: 'center' }}>
+                                    {Object.keys(this.state.profile).map((key) => {
+                                        return(
+                                                <Grid>
+                                                    <Col>
+                                                        <Text style={styles.leftCol}>
+                                                            {columns[key]}
+                                                        </Text>
+                                                    </Col>
+                                                    <Col>
+                                                        <Text style={styles.text}>
+                                                            {key === 'dateOfBirth' ? this.formatDate(this.state.profile[key]) : this.state.profile[key]}
+                                                        </Text>
+                                                    </Col>
+                                                </Grid>
+
+                                        )
+                                    })}
+                                    <Row></Row>
+                                </Col>
                             </Row>
-                            <Row style={{ width: '100%' }} size={20}>
+                            <Row style={{ width: '100%' }} size={30}>
                                 <Col>
                                     <Button
-                                        mode="contained" style={{ margin: 5 }} color="#E9190F"
+                                        mode="contained" style={styles.btn} color="#E9190F"
                                         title={'Scan Again'}
-                                        onPress={() => this.setState({ scanned: false })}
+                                        onPress={() => this.setState({ scanned: false, profile: {} })}
                                     >
                                         Scan Again
                                     </Button>
                                 </Col>
                                 <Col>
                                     <Button
-                                        mode="contained" style={{ margin: 5 }} color="#3ad53a"
+                                        mode="contained" style={styles.btn} color="#3ad53a"
                                         title={'Check In'}
                                         onPress={() => this.CheckIn()}
                                     >
@@ -77,6 +110,36 @@ export default class BarcodeScannerExample extends React.Component {
     }
 
     handleBarCodeScanned = ({ data }) => {
-        this.setState({ scanned: true, email: data });
+
+        console.log('data: ', data);
+
+        axios.get(`https://hawkhack.io/api/a/profiles/${data}`, { headers: {Authorization: token} })
+            .then(response => {
+                this.setState({ scanned: true, profile: {
+                        firstName: response.data.firstName,
+                        lastName: response.data.lastName,
+                        email: response.data.email,
+                        dateOfBirth: response.data.dateOfBirth,
+                        school: response.data.school,
+                        status: response.data.status
+                    } });
+                console.log('profile: ', this.state.profile);
+            })
+            .catch(e => console.log(e));
     };
 }
+
+const styles = StyleSheet.create({
+    text: {
+        fontSize: 20,
+    },
+    leftCol:{
+        fontWeight: "bold",
+        fontSize: 26
+    },
+    btn: {
+        margin: 5,
+        padding: 25
+    },
+
+});
