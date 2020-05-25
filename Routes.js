@@ -7,7 +7,6 @@ import TopNav from "./components/TopNav";
 
 const Routes = () => (
     <>
-        <TopNav title='Login' subtitle='Please Login' />
         <Router navigationBarStyle={{ backgroundColor: '#E9190F' }}>
             <Scene key="root">
                 <Scene key="QRScanner" component={Scan} title="Scanner" hideNavBar={true} />

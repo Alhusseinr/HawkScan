@@ -8,6 +8,7 @@ import {
 import { Actions } from "react-native-router-flux";
 import { TextInput, Button, HelperText } from 'react-native-paper';
 import axios from 'react-native-axios';
+import TopNav from "./TopNav";
 
 const theme = {
     colors: { primary: '#E9190F', underlayColor: 'transparent'}
@@ -79,47 +80,50 @@ class LoginScreen extends React.Component {
                 style={styles.outsideContainer}
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-                    <View style={styles.container}>
-                        <Text style={styles.logo}>HawkHack</Text>
-                        <View style={styles.form}>
+                    <>
+                        <TopNav title='Login' subtitle='Please Login' />
+                        <View style={styles.container}>
+                            <Text style={styles.logo}>HawkHack</Text>
+                            <View style={styles.form}>
+                                    <TextInput
+                                        value={this.state.email}
+                                        onChangeText={this.handleEmailChange}
+                                        label="Email"
+                                        compact={true}
+                                        selectionColor="red"
+                                        mode="outlined"
+                                        theme={theme}
+                                    />
+                                    {this.state.errors.email ?
+                                        <HelperText type="error">
+                                            {this.state.errors.email}
+                                        </HelperText>
+                                        :
+                                        <Text></Text>
+                                    }
+
                                 <TextInput
-                                    value={this.state.email}
-                                    onChangeText={this.handleEmailChange}
-                                    label="Email"
-                                    compact={true}
-                                    selectionColor="red"
+                                    value={this.state.password}
+                                    onChangeText={this.handlePasswordChange}
+                                    label="Password"
+                                    style={{ marginTop: 15 }}
                                     mode="outlined"
                                     theme={theme}
+                                    secureTextEntry={true}
                                 />
-                                {this.state.errors.email ?
+                                {this.state.errors.password ?
                                     <HelperText type="error">
-                                        {this.state.errors.email}
+                                        {this.state.errors.password}
                                     </HelperText>
                                     :
                                     <Text></Text>
                                 }
-
-                            <TextInput
-                                value={this.state.password}
-                                onChangeText={this.handlePasswordChange}
-                                label="Password"
-                                style={{ marginTop: 15 }}
-                                mode="outlined"
-                                theme={theme}
-                                secureTextEntry={true}
-                            />
-                            {this.state.errors.password ?
-                                <HelperText type="error">
-                                    {this.state.errors.password}
-                                </HelperText>
-                                :
-                                <Text></Text>
-                            }
-                            <Button title="LOGIN" onPress={this.handleLogin} mode="contained" style={{ marginTop: 15, padding: 5 }} color="#E9190F" >
-                                Login
-                            </Button>
+                                <Button title="LOGIN" onPress={this.handleLogin} mode="contained" style={{ marginTop: 15, padding: 5 }} color="#E9190F" >
+                                    Login
+                                </Button>
+                            </View>
                         </View>
-                    </View>
+                    </>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>
         );
