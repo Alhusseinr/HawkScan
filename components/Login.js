@@ -13,9 +13,6 @@ const theme = {
     colors: { primary: '#E9190F', underlayColor: 'transparent'}
 };
 
-const URI = '127.0.0.1:5000';
-
-
 class LoginScreen extends React.Component {
     constructor(props) {
         super(props);
@@ -24,16 +21,16 @@ class LoginScreen extends React.Component {
             email: "",
             password: "",
             errors: {},
-            token: ''
+            token: null
         }
     }
 
     handleEmailChange = (email) => {
-        this.setState({email: email});
+        this.setState({ email: email });
     };
 
     handlePasswordChange = (password) => {
-        this.setState({password: password});
+        this.setState({ password: password });
     };
 
     handleLogin = () => {
@@ -42,42 +39,24 @@ class LoginScreen extends React.Component {
         this.setState({ errors });
 
         if (Object.keys(errors).length === 0) {
-
-            //console.log("here", AsyncStorage.getItem('token'));
-
-
-            // axios.post('https://hawkhack.io/api/u/login', {email, password})
-            //     .then(response => {
-            //         console.log('response', response.data.token);
-            //         if(response.status === 200) {
-            //             this.setTokenValue(response.data.token);
-            //             console.log('all keys: ', this._getStorageValue());
-            //             AsyncStorage.getAllKeys().then(console.log);
-            //             if(AsyncStorage.getItem('token') === null) {
-            //                 AsyncStorage.setItem('token', response.data.token);
-            //                 console.log(this._getStorageValue());
-            //             } else {
-            //                 AsyncStorage.removeItem('token');
-            //                 console.log('removed token');
-            //                 Actions.Login();
-            //             }
-            //         }
-            //     }).catch(e => {
-            //         console.log(e);
-            //         throw e;
-            //     });
-
-            // fetch(URI + '/api/u/login', {
-            //     method: 'POST',
-            //     body: JSON.stringify(email, password),
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     }
-            // }).then(response => response.json()).then(result => {
-            //     console.log('results', result)
-            // }).catch(e => console.log(e));
-
-            Actions.QRScanner();
+            axios.post('https://hawkhack.io/api/u/login', { email, password })
+                .then(response => {
+                    console.log(response);
+                    if(response.status === 200) {
+                        if(this.state.token === null) {
+                            this.setState({ token: response.data.token });
+                            Actions.QRScanner();
+                        } else if (this.state.token) {
+                            alert('An account is already logged in, please try again');
+                            this.setState({ token: null });
+                        }
+                    } else if(response.status === 400) {
+                        alert('Something went wrong, please try again');
+                    }
+                }).catch(e => {
+                    console.log(e);
+                    throw e;
+                });
         }
     };
 

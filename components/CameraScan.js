@@ -1,26 +1,21 @@
 import * as React from 'react';
 import {Text, View, StyleSheet, AsyncStorage} from 'react-native';
 import * as Permissions from 'expo-permissions';
-import { Button } from 'react-native-paper';
 import { Col, Row, Grid } from 'react-native-easy-grid';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import axios from 'react-native-axios';
-const token = '';
-
-const columns = {
-    firstName: 'First Name: ',
-    lastName: 'Last Name: ',
-    email: 'Email: ',
-    dateOfBirth: 'Date Of Birth: ',
-    school: 'School: ',
-    status: 'Status: '
-};
+import TopNav from "./TopNav";
+import UserInfo from "./UserInfo";
+import {Actions} from "react-native-router-flux";
+const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlNWVhZGRjMTNjZmYxMzM4OTY3N2IxMSIsImlhdCI6MTU5MDM2NDE4MiwiZXhwIjoxNTkwMzY3NzgyfQ.pQ9Y0vfksF_qVmTIZM7KIEEJN_1zlEyh-Oh2iUA_cAA';
 
 export default class BarcodeScannerExample extends React.Component {
     state = {
         hasCameraPermission: null,
         scanned: false,
-        profile: {}
+        profile: {},
+        title: 'Scanner',
+        subtitle: 'Scan hackers QR code'
     };
 
     async componentDidMount() {
@@ -36,11 +31,6 @@ export default class BarcodeScannerExample extends React.Component {
         alert(`${this.state.profile.firstName + ' ' + this.state.profile.lastName} has been checked in`);
     };
 
-    formatDate = (date) => {
-        const newDate = date.substring(0, 10);
-        return newDate;
-    };
-
     render() {
         const { hasCameraPermission, scanned } = this.state;
 
@@ -51,69 +41,27 @@ export default class BarcodeScannerExample extends React.Component {
             return <Text>No access to camera</Text>;
         }
         return (
-            <Grid>
-                {scanned  ?
-                    <Row>
-                        <Grid>
-                            <Row style={{ margin: 20 }} size={70}>
-                                <Col style={{ alignItems: 'center' }}>
-                                    {Object.keys(this.state.profile).map((key) => {
-                                        return(
-                                                <Grid>
-                                                    <Col>
-                                                        <Text style={styles.leftCol}>
-                                                            {columns[key]}
-                                                        </Text>
-                                                    </Col>
-                                                    <Col>
-                                                        <Text style={styles.text}>
-                                                            {key === 'dateOfBirth' ? this.formatDate(this.state.profile[key]) : this.state.profile[key]}
-                                                        </Text>
-                                                    </Col>
-                                                </Grid>
-
-                                        )
-                                    })}
-                                    <Row></Row>
-                                </Col>
-                            </Row>
-                            <Row style={{ width: '100%' }} size={30}>
-                                <Col>
-                                    <Button
-                                        mode="contained" style={styles.btn} color="#E9190F"
-                                        title={'Scan Again'}
-                                        onPress={() => this.setState({ scanned: false, profile: {} })}
-                                    >
-                                        Scan Again
-                                    </Button>
-                                </Col>
-                                <Col>
-                                    <Button
-                                        mode="contained" style={styles.btn} color="#3ad53a"
-                                        title={'Check In'}
-                                        onPress={() => this.CheckIn()}
-                                    >
-                                        Check In
-                                    </Button>
-                                </Col>
-                            </Row>
-                        </Grid>
-                    </Row>
-                    :
-                    <BarCodeScanner
-                        onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
-                        style={StyleSheet.absoluteFillObject}
-                    />
-                }
-            </Grid>
+            <>
+                <TopNav title={this.state.title} subtitle={this.state.subtitle} />
+                <Grid>
+                    {scanned  ?
+                        Actions.UserInfo({
+                            profile: this.state.profile,
+                            scanned: this.state.scanned
+                        })
+                        :
+                        <BarCodeScanner
+                            onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
+                            style={StyleSheet.absoluteFillObject}
+                        />
+                    }
+                </Grid>
+            </>
         );
     }
 
     handleBarCodeScanned = ({ data }) => {
-
-        console.log('data: ', data);
-
-        axios.get(`https://hawkhack.io/api/a/profiles/${data}`, { headers: {Authorization: token} })
+        axios.get(`https://hawkhack.io/api/a/profiles/${data}`, { headers: { Authorization: token } })
             .then(response => {
                 this.setState({ scanned: true, profile: {
                         firstName: response.data.firstName,
@@ -129,17 +77,4 @@ export default class BarcodeScannerExample extends React.Component {
     };
 }
 
-const styles = StyleSheet.create({
-    text: {
-        fontSize: 20,
-    },
-    leftCol:{
-        fontWeight: "bold",
-        fontSize: 26
-    },
-    btn: {
-        margin: 5,
-        padding: 25
-    },
 
-});
