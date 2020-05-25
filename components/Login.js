@@ -24,7 +24,7 @@ class LoginScreen extends React.Component {
             errors: {},
             token: null
         }
-    }
+    };
 
     handleEmailChange = (email) => {
         this.setState({ email: email });
@@ -32,6 +32,27 @@ class LoginScreen extends React.Component {
 
     handlePasswordChange = (password) => {
         this.setState({ password: password });
+    };
+
+    _storeToken = async (token) => {
+        try{
+            await AsyncStorage.setItem('token', token);
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    _retrieveToken = async (key) => {
+        try {
+            const value = await AsyncStorage.getItem('token');
+            if(value !== null){
+                console.log('token in localStorage: ', value);
+                return value;
+            }
+            return value;
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     handleLogin = () => {
@@ -42,14 +63,9 @@ class LoginScreen extends React.Component {
         if (Object.keys(errors).length === 0) {
             axios.post('https://hawkhack.io/api/u/login', { email, password })
                 .then(response => {
-                    console.log(response);
                     if(response.status === 200) {
-                        if(this.state.token === null) {
-                            this.setState({ token: response.data.token });
+                        if(this._storeToken(response.data.token) !== null) {
                             Actions.QRScanner();
-                        } else if (this.state.token) {
-                            alert('An account is already logged in, please try again');
-                            this.setState({ token: null });
                         }
                     } else if(response.status === 400) {
                         alert('Something went wrong, please try again');
@@ -64,7 +80,7 @@ class LoginScreen extends React.Component {
     setTokenValue(token) {
         console.log('here in setting token');
         AsyncStorage.setItem('different name', 'Hard coded token', () => {}).then(r => {console.log(r)}).catch(e => console.log(e));
-    }
+    };
 
     isEmpty = (email, password) => {
         const errors = {};
