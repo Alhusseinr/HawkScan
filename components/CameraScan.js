@@ -1,13 +1,11 @@
 import * as React from 'react';
 import {Text, View, StyleSheet, AsyncStorage} from 'react-native';
 import * as Permissions from 'expo-permissions';
-import { Col, Row, Grid } from 'react-native-easy-grid';
+import { Grid } from 'react-native-easy-grid';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import axios from 'react-native-axios';
 import TopNav from "./TopNav";
-import UserInfo from "./UserInfo";
 import {Actions} from "react-native-router-flux";
-const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlNWVhZGRjMTNjZmYxMzM4OTY3N2IxMSIsImlhdCI6MTU5MDM2NDE4MiwiZXhwIjoxNTkwMzY3NzgyfQ.pQ9Y0vfksF_qVmTIZM7KIEEJN_1zlEyh-Oh2iUA_cAA';
 
 export default class BarcodeScannerExample extends React.Component {
     state = {
@@ -15,12 +13,32 @@ export default class BarcodeScannerExample extends React.Component {
         scanned: false,
         profile: {},
         title: 'Scanner',
-        subtitle: 'Scan hackers QR code'
+        subtitle: 'Scan hackers QR code',
+        token: this.props.token
     };
 
     async componentDidMount() {
         this.getPermissionsAsync();
     }
+
+    _verifyToken = async () => {
+        try {
+            const value = await AsyncStorage.getItem('token');
+            if(value !== null){
+                axios.get('https://hawkhack.io/api/a/profiles/', { Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlNWVhZGRjMTNjZmYxMzM4OTY3N2IxMSIsImlhdCI6MTU5MDM4MDYxMCwiZXhwIjoxNTkwMzg0MjEwfQ.GuR6WvFgr10tlRpKxd0Q7mwA5VxZAIaxA_1xsEckdHw' })
+                    .then(response => {
+                        if (response.status === 400) {
+                            Actions.Login();
+                        }
+                    })
+                    .catch(e => console.log(e));
+                console.log('token in scanner: ', value);
+                return value
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
     getPermissionsAsync = async () => {
         const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -29,6 +47,36 @@ export default class BarcodeScannerExample extends React.Component {
 
     CheckIn = () => {
         alert(`${this.state.profile.firstName + ' ' + this.state.profile.lastName} has been checked in`);
+    };
+
+    _retrieveToken = async (email) => {
+        try {
+            const value = await AsyncStorage.getItem('token');
+            if(value !== null){
+                axios.get(`https://hawkhack.io/api/a/profiles/${email}`, { headers: { Authorization: value } })
+                    .then(response => {
+                        this.setState({ scanned: true, profile: {
+                                firstName: response.data.firstName,
+                                lastName: response.data.lastName,
+                                email: response.data.email,
+                                dateOfBirth: response.data.dateOfBirth,
+                                school: response.data.school,
+                                status: response.data.status
+                            }
+                        });
+                        console.log('profile: ', this.state.profile);
+                    })
+                    .catch(e => console.log(e));
+                console.log('token in scanner: ', value);
+                return value
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    handleBarCodeScanned = ({ data }) => {
+        this._retrieveToken(data);
     };
 
     render() {
@@ -59,22 +107,6 @@ export default class BarcodeScannerExample extends React.Component {
             </>
         );
     }
-
-    handleBarCodeScanned = ({ data }) => {
-        axios.get(`https://hawkhack.io/api/a/profiles/${data}`, { headers: { Authorization: token } })
-            .then(response => {
-                this.setState({ scanned: true, profile: {
-                        firstName: response.data.firstName,
-                        lastName: response.data.lastName,
-                        email: response.data.email,
-                        dateOfBirth: response.data.dateOfBirth,
-                        school: response.data.school,
-                        status: response.data.status
-                    } });
-                console.log('profile: ', this.state.profile);
-            })
-            .catch(e => console.log(e));
-    };
 }
 
 

@@ -49,4 +49,5 @@ target 'parkable' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+
 end

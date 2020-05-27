@@ -42,7 +42,7 @@ class LoginScreen extends React.Component {
         }
     };
 
-    _retrieveToken = async (key) => {
+    _retrieveToken = async () => {
         try {
             const value = await AsyncStorage.getItem('token');
             if(value !== null){
@@ -55,7 +55,7 @@ class LoginScreen extends React.Component {
         }
     };
 
-    handleLogin = () => {
+    handleLogin = async () => {
         const { email, password } = this.state;
         const errors = this.isEmpty(email, password);
         this.setState({ errors });
@@ -63,23 +63,19 @@ class LoginScreen extends React.Component {
         if (Object.keys(errors).length === 0) {
             axios.post('https://hawkhack.io/api/u/login', { email, password })
                 .then(response => {
+                    console.log(response.status);
                     if(response.status === 200) {
                         if(this._storeToken(response.data.token) !== null) {
+                            console.log(this._retrieveToken());
                             Actions.QRScanner();
                         }
-                    } else if(response.status === 400) {
-                        alert('Something went wrong, please try again');
                     }
                 }).catch(e => {
-                    console.log(e);
-                    throw e;
+                    const errors = {};
+                    errors.failedLogin = "Wrong email or password!";
+                    this.setState({ errors });
                 });
         }
-    };
-
-    setTokenValue(token) {
-        console.log('here in setting token');
-        AsyncStorage.setItem('different name', 'Hard coded token', () => {}).then(r => {console.log(r)}).catch(e => console.log(e));
     };
 
     isEmpty = (email, password) => {
@@ -130,6 +126,13 @@ class LoginScreen extends React.Component {
                                 {this.state.errors.password ?
                                     <HelperText type="error">
                                         {this.state.errors.password}
+                                    </HelperText>
+                                    :
+                                    <Text></Text>
+                                }
+                                {this.state.errors.failedLogin ?
+                                    <HelperText type="error">
+                                        {this.state.errors.failedLogin}
                                     </HelperText>
                                     :
                                     <Text></Text>

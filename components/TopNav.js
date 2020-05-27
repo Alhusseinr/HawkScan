@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { Appbar } from "react-native-paper";
+import {AsyncStorage} from "react-native";
+import {Actions} from "react-native-router-flux";
 
 export default class TopNav extends Component {
     constructor(props) {
@@ -11,8 +13,17 @@ export default class TopNav extends Component {
         }
     }
 
+    _removeToken = async () => {
+        try{
+            await AsyncStorage.removeItem('token');
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     goBack = () => {
-        // go back to previous
+        this._removeToken();
+        Actions.Login();
     };
 
     render() {

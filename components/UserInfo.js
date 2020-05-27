@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import {StyleSheet, Text} from "react-native";
+import {AsyncStorage, StyleSheet, Text} from "react-native";
 import { Grid, Row, Col } from "react-native-easy-grid";
 import { Button } from "react-native-paper";
 import {Actions} from "react-native-router-flux";
 import TopNav from "./TopNav";
+import axios from "react-native-axios";
 
 const columns = {
     firstName: 'First Name: ',
@@ -26,6 +27,29 @@ class UserInfo extends Component {
         }
     }
 
+    componentWillMount() {
+        this._verifyToken()
+    }
+
+    _verifyToken = async () => {
+        try {
+            const value = await AsyncStorage.getItem('token');
+            if(value !== null){
+                axios.get('https://hawkhack.io/api/a/profiles/', { Authorization: value })
+                    .then(response => {
+                        if (response.status === 400) {
+                            Actions.Login();
+                        }
+                    })
+                    .catch(e => console.log(e));
+                console.log('token in scanner: ', value);
+                return value
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     formatDate = (date) => {
         const newDate = date.substring(0, 10);
         return newDate;
@@ -41,7 +65,7 @@ class UserInfo extends Component {
                             <Col style={{ alignItems: 'center' }}>
                                 {Object.keys(this.state.profile).map((key) => {
                                     return(
-                                        <Grid>
+                                        <Grid key={key}>
                                             <Col>
                                                 <Text style={styles.leftCol}>
                                                     {columns[key]}
@@ -63,7 +87,7 @@ class UserInfo extends Component {
                                     mode="contained" style={styles.btn} color="#E9190F"
                                     title={'Scan Again'}
                                     onPress={() => {
-                                        this.setState({ scanned: false, profile: {} })
+                                        this.setState({ scanned: false, profile: {} });
                                         Actions.QRScanner({ scanned: this.state.scanned, profile: this.state.profile });
                                     }}
                                 >
